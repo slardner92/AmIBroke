@@ -137,7 +137,7 @@ function showLoading() {
  * Fail exactly 1  → YOU'RE OKAY
  * Fail 2 or 3     → YOU'RE BROKE
  */
-function getVerdict(housingRatio, carRatio, totalDebtRatio, housingBenchmark, housingType) {
+function getVerdict(housingRatio, totalDebtRatio, housingBenchmark, housingType) {
   const housingLabel = housingType === 'rent' ? 'rent' : 'mortgage';
   const tests = [
     {
@@ -145,12 +145,6 @@ function getVerdict(housingRatio, carRatio, totalDebtRatio, housingBenchmark, ho
       rule:   `≤ ${housingBenchmark}% of income on ${housingLabel}`,
       pass:   housingRatio  <= housingBenchmark,
       actual: housingRatio,
-    },
-    {
-      label:  'The 8% Car Rule',
-      rule:   '≤ 8% of income on car payments',
-      pass:   carRatio      <= 8,
-      actual: carRatio,
     },
     {
       label:  'The 43% Total Debt Rule',
@@ -187,7 +181,7 @@ function renderResults(data) {
           monthlyIncome, freeCashFlow, totalMonthlyDebt } = data;
 
   const { verdict, tagline, verdictClass, tests } = getVerdict(
-    housingRatio, carRatio, totalDebtRatio, housingBenchmark, housingType
+    housingRatio, totalDebtRatio, housingBenchmark, housingType
   );
 
   const testCards = tests.map(t => `
