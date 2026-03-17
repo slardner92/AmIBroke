@@ -72,8 +72,12 @@
           </div>
 
           <div class="form-group">
-            <label for="rent">Monthly Rent/Mortgage ($)</label>
-            <input type="text" id="rent" placeholder="e.g. 1,800" inputmode="numeric" autocomplete="off">
+            <div class="housing-toggle" role="group" aria-label="Housing type">
+              <button type="button" class="housing-toggle__btn housing-toggle__btn--active" data-type="rent">RENT</button>
+              <button type="button" class="housing-toggle__btn" data-type="mortgage">MORTGAGE</button>
+            </div>
+            <label for="housing" id="housing-label">Monthly Rent ($)</label>
+            <input type="text" id="housing" placeholder="e.g. 1,800" inputmode="numeric" autocomplete="off">
           </div>
 
           <div class="form-group">
@@ -87,16 +91,10 @@
             <p class="form-hint">Enter your ZIP code to see how you compare to people in your area. We will not save or sell your Zip code!</p>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="debt">Total Additional Debt ($)</label>
-              <input type="text" id="debt" placeholder="e.g. 15,000" inputmode="numeric" autocomplete="off">
-              <p class="form-hint">*Exclude mortgage and car loan from total additional debt</p>
-            </div>
-            <div class="form-group form-group--narrow">
-              <label for="interestRate">@ Interest Rate (%)</label>
-              <input type="text" id="interestRate" placeholder="e.g. 5.5" inputmode="decimal" autocomplete="off">
-            </div>
+          <div class="form-group">
+            <label for="debt">Other Monthly Debt Payments ($)</label>
+            <input type="text" id="debt" placeholder="e.g. 500" inputmode="numeric" autocomplete="off">
+            <p class="form-hint">Such as student loan or credit card payments</p>
           </div>
 
           <button type="submit" class="btn btn-judge">JUDGE ME ↓</button>
@@ -124,7 +122,7 @@
       <div class="why-card">
         <div class="why-icon">⚠️</div>
         <h3>Debt Trap Danger</h3>
-        <p>If &gt; 50% of your monthly income goes to repaying debt (we include housing + car payments as debt for simplicity), then you're in trouble.</p>
+        <p>If &gt; 43% of your gross income goes to total debt (housing + car + other payments), you're in the danger zone — and likely to struggle to qualify for future credit.</p>
       </div>
 
       <div class="why-card">
