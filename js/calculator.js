@@ -5,17 +5,32 @@
 const form    = document.getElementById('broke-form');
 const results = document.getElementById('results');
 
+// ---- Housing type toggle ----
+
+let housingType = 'rent'; // 'rent' | 'mortgage'
+
+const toggleBtns   = document.querySelectorAll('.housing-toggle__btn');
+const housingLabel = document.getElementById('housing-label');
+
+toggleBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    housingType = btn.dataset.type;
+    // Update active state
+    toggleBtns.forEach(b => b.classList.toggle('housing-toggle__btn--active', b === btn));
+    // Update input label
+    housingLabel.textContent = housingType === 'rent' ? 'Monthly Rent ($)' : 'Monthly Mortgage ($)';
+  });
+});
+
 // ---- Comma formatting on $ inputs ----
 
-const CURRENCY_INPUT_IDS = ['salary', 'rent', 'carPayment', 'debt'];
+const CURRENCY_INPUT_IDS = ['salary', 'housing', 'carPayment', 'debt'];
 
 function addCommaFormatting(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.addEventListener('input', function () {
-    // Strip everything except digits
     const digits = this.value.replace(/[^\d]/g, '');
-    // Re-insert commas
     this.value = digits === '' ? '' : Number(digits).toLocaleString('en-US');
   });
 }
@@ -38,29 +53,17 @@ function formatPercent(n) {
   return n.toFixed(1) + '%';
 }
 
-/**
- * Estimate monthly payment on a lump debt using amortisation.
- * Falls back to a 5-year simple divide if no rate given.
- */
-function monthlyDebtPayment(principal, annualRatePct, months = 60) {
-  if (principal <= 0) return 0;
-  if (annualRatePct <= 0) return principal / months;
-  const r = (annualRatePct / 100) / 12;
-  return principal * (r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
-}
-
 // ---- Form submit ----
 
 form.addEventListener('submit', function (e) {
   e.preventDefault();
 
   // 1. Read inputs
-  const salary       = parseNumber('salary');
-  const rent         = parseNumber('rent');
-  const car          = parseNumber('carPayment');
-  const zip          = document.getElementById('zipCode').value.trim();
-  const debt         = parseNumber('debt');
-  const interestRate = parseNumber('interestRate');
+  const salary  = parseNumber('salary');
+  const housing = parseNumber('housing');
+  const car     = parseNumber('carPayment');
+  const zip     = document.getElementById('zipCode').value.trim();
+  const debt    = parseNumber('debt'); // direct monthly payment
 
   // 2. Basic validation
   if (salary <= 0) {
@@ -70,24 +73,31 @@ form.addEventListener('submit', function (e) {
   }
 
   // 3. Core calculations
-  const monthlyIncome   = salary / 12;
-  const debtPayment     = monthlyDebtPayment(debt, interestRate);
-  const totalMonthlyDebt = rent + car + debtPayment;
-  const freeCashFlow    = monthlyIncome - totalMonthlyDebt;
+  const monthlyIncome = salary / 12;
 
-  const housingRatio    = (rent         / monthlyIncome) * 100;
-  const carRatio        = (car          / monthlyIncome) * 100;
-  const totalDebtRatio  = (totalMonthlyDebt / monthlyIncome) * 100;
+  // Housing ratio — 30% for renters, 36% for mortgage holders
+  const housingBenchmark = housingType === 'rent' ? 30 : 36;
+  const housingRatio     = (housing / monthlyIncome) * 100;
+
+  // Car ratio — 8% benchmark
+  const carRatio = (car / monthlyIncome) * 100;
+
+  // Total debt ratio — housing + car + other monthly debt, 43% benchmark
+  const totalMonthlyDebt = housing + car + debt;
+  const totalDebtRatio   = (totalMonthlyDebt / monthlyIncome) * 100;
+
+  // Free cash flow
+  const freeCashFlow = monthlyIncome - totalMonthlyDebt;
 
   // 4. Bundle data for renderResults
   const data = {
     salary,
     monthlyIncome,
-    rent,
+    housing,
+    housingType,
+    housingBenchmark,
     car,
     debt,
-    interestRate,
-    debtPayment,
     totalMonthlyDebt,
     freeCashFlow,
     housingRatio,
@@ -119,19 +129,35 @@ function showLoading() {
 
 /**
  * Three ratio tests:
- *  1. Housing  ≤ 28%
+ *  1. Housing  ≤ 30% (rent) or ≤ 36% (mortgage)
  *  2. Car      ≤  8%
- *  3. Total debt ≤ 50%
+ *  3. Total debt (housing + car + other) ≤ 43%
  *
- * Pass all 3  → YOU'RE KILLING IT
- * Fail exactly 1 → YOU'RE OKAY
- * Fail 2 or 3 → YOU'RE BROKE
+ * Pass all 3      → YOU'RE KILLING IT
+ * Fail exactly 1  → YOU'RE OKAY
+ * Fail 2 or 3     → YOU'RE BROKE
  */
-function getVerdict(housingRatio, carRatio, totalDebtRatio) {
+function getVerdict(housingRatio, carRatio, totalDebtRatio, housingBenchmark, housingType) {
+  const housingLabel = housingType === 'rent' ? 'rent' : 'mortgage';
   const tests = [
-    { label: 'The 28% Housing Rule', rule: '≤ 28% of income on housing',  pass: housingRatio   <= 28, actual: housingRatio,   benchmark: 28  },
-    { label: 'The 8% Car Rule',      rule: '≤ 8% of income on car',       pass: carRatio       <= 8,  actual: carRatio,       benchmark: 8   },
-    { label: 'The 50% Debt Rule',    rule: '≤ 50% of income on all debt', pass: totalDebtRatio <= 50, actual: totalDebtRatio, benchmark: 50  },
+    {
+      label:  `The ${housingBenchmark}% Housing Rule`,
+      rule:   `≤ ${housingBenchmark}% of income on ${housingLabel}`,
+      pass:   housingRatio  <= housingBenchmark,
+      actual: housingRatio,
+    },
+    {
+      label:  'The 8% Car Rule',
+      rule:   '≤ 8% of income on car payments',
+      pass:   carRatio      <= 8,
+      actual: carRatio,
+    },
+    {
+      label:  'The 43% Total Debt Rule',
+      rule:   '≤ 43% of income on all debt (housing + car + other)',
+      pass:   totalDebtRatio <= 43,
+      actual: totalDebtRatio,
+    },
   ];
 
   const failures = tests.filter(t => !t.pass).length;
@@ -157,8 +183,12 @@ function getVerdict(housingRatio, carRatio, totalDebtRatio) {
 // ---- Results renderer ----
 
 function renderResults(data) {
-  const { housingRatio, carRatio, totalDebtRatio, monthlyIncome, freeCashFlow } = data;
-  const { verdict, tagline, verdictClass, tests } = getVerdict(housingRatio, carRatio, totalDebtRatio);
+  const { housingRatio, carRatio, totalDebtRatio, housingBenchmark, housingType,
+          monthlyIncome, freeCashFlow, totalMonthlyDebt } = data;
+
+  const { verdict, tagline, verdictClass, tests } = getVerdict(
+    housingRatio, carRatio, totalDebtRatio, housingBenchmark, housingType
+  );
 
   const testCards = tests.map(t => `
     <div class="result-test ${t.pass ? 'result-test--pass' : 'result-test--fail'}">
@@ -197,8 +227,8 @@ function renderResults(data) {
           <span class="stat__value">${formatCurrency(monthlyIncome)}</span>
         </div>
         <div class="stat">
-          <span class="stat__label">Monthly Debt Obligations</span>
-          <span class="stat__value">${formatCurrency(data.totalMonthlyDebt)}</span>
+          <span class="stat__label">Total Monthly Debt</span>
+          <span class="stat__value">${formatCurrency(totalMonthlyDebt)}</span>
         </div>
         <div class="stat ${cashFlowClass}">
           <span class="stat__label">Free Cash Flow</span>

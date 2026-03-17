@@ -338,6 +338,39 @@ body {
   width: 130px;
 }
 
+/* ---- Housing type pill toggle ---- */
+.housing-toggle {
+  display: flex;
+  border: 2px solid var(--blue);
+  border-radius: 50px;
+  overflow: hidden;
+  width: fit-content;
+  margin-bottom: 12px;
+}
+
+.housing-toggle__btn {
+  padding: 8px 24px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--blue);
+  transition: background 0.2s ease, color 0.2s ease;
+  line-height: 1;
+}
+
+.housing-toggle__btn--active {
+  background: var(--blue);
+  color: var(--white);
+}
+
+.housing-toggle__btn:not(.housing-toggle__btn--active):hover {
+  background: rgba(28, 28, 245, 0.07);
+}
+
 /* ============================================
    RESULTS SECTION
    ============================================ */
