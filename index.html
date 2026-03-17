@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home | Am I Broke?</title>
+  <meta name="description" content="Stop guessing. Start knowing. Enter your numbers and get the brutal truth about your financial health in less than 30 seconds.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ── Ticker ── -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>• 100% FREE</span><span>• INSTANT RESULT</span><span>• NO SIGNUP</span><span>• 💸</span>
+      <span>• 100% FREE</span><span>• INSTANT RESULT</span><span>• NO SIGNUP</span><span>• 💸</span>
+      <span>• 100% FREE</span><span>• INSTANT RESULT</span><span>• NO SIGNUP</span><span>• 💸</span>
+      <span>• 100% FREE</span><span>• INSTANT RESULT</span><span>• NO SIGNUP</span><span>• 💸</span>
+    </div>
+  </div>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="hero-panel hero-panel--left"  aria-hidden="true"></div>
+    <div class="hero-panel hero-panel--right" aria-hidden="true"></div>
+    <div class="hero-badge" aria-hidden="true">RESULT • 100% FREE • INSTANT •</div>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow">The Financial Reality Check</p>
+      <h1 class="hero-title">AM I<br>BROKE?</h1>
+      <hr class="hero-divider">
+      <p class="hero-tagline">
+        Stop guessing. Start knowing. Enter your numbers<br>
+        and get the brutal truth about your financial health<br>
+        in less than 30 seconds.
+      </p>
+      <a href="#calculator" class="btn btn-hero">TAKE THE TEST</a>
+    </div>
+  </section>
+
+  <!-- ── Calculator ── -->
+  <section class="calculator-section" id="calculator">
+    <div class="calculator-grid">
+
+      <!-- Left: info -->
+      <div class="calculator-info">
+        <span class="step-label">STEP 01</span>
+        <h2 class="section-title">WE GOTTA<br>ASK</h2>
+        <p class="section-body">
+          We need the raw numbers. Don't lie to yourself.
+          Input just 5 key facts and we'll tell you straight!
+        </p>
+        <ul class="trust-list">
+          <li>
+            <span class="trust-icon">🛡️</span>
+            <span>Data never leaves your browser</span>
+          </li>
+          <li>
+            <span class="trust-icon">⚡</span>
+            <span>Instant calculation</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right: form -->
+      <div class="calculator-form-wrapper">
+        <form id="broke-form" class="calculator-form" novalidate>
+
+          <div class="form-group">
+            <label for="salary">Annual Salary ($)</label>
+            <input type="text" id="salary" placeholder="e.g. 75,000" inputmode="numeric" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="rent">Monthly Rent/Mortgage ($)</label>
+            <input type="text" id="rent" placeholder="e.g. 1,800" inputmode="numeric" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="carPayment">Monthly Car Payment ($)</label>
+            <input type="text" id="carPayment" placeholder="e.g. 450" inputmode="numeric" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="zipCode">ZIP Code</label>
+            <input type="text" id="zipCode" placeholder="e.g. 10001" inputmode="numeric" maxlength="5" autocomplete="off">
+            <p class="form-hint">Enter your ZIP code to see how you compare to people in your area. We will not save or sell your Zip code!</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="debt">Total Additional Debt ($)</label>
+              <input type="text" id="debt" placeholder="e.g. 15,000" inputmode="numeric" autocomplete="off">
+              <p class="form-hint">*Exclude mortgage and car loan from total additional debt</p>
+            </div>
+            <div class="form-group form-group--narrow">
+              <label for="interestRate">@ Interest Rate (%)</label>
+              <input type="text" id="interestRate" placeholder="e.g. 5.5" inputmode="decimal" autocomplete="off">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-judge">JUDGE ME ↓</button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Results (injected by calculator.js) ── -->
+  <section class="results-section" id="results" hidden></section>
+
+  <!-- ── Why It Matters ── -->
+  <section class="why-section">
+    <h2 class="why-title">WHY IT MATTERS</h2>
+    <div class="why-accent"></div>
+    <div class="why-grid">
+
+      <div class="why-card">
+        <div class="why-icon">📈</div>
+        <h3>The 28/8 Rule</h3>
+        <p>Ideally, no more than 28% of income goes to housing, with another 8% going to car payments. This leaves you with enough leftover for groceries, gas, and BOBA</p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-icon">⚠️</div>
+        <h3>Debt Trap Danger</h3>
+        <p>If &gt; 50% of your monthly income goes to repaying debt (we include housing + car payments as debt for simplicity), then you're in trouble.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-icon">💵</div>
+        <h3>Cash Flow King</h3>
+        <p>Salary is vanity, free cash flow is sanity. Can you actually afford your monthly life?</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">AM I BROKE?</div>
+      <p class="footer-disclaimer">This calculator provides a rough answer for entertainment purposes; it does not constitute professional financial advice.</p>
+      <nav class="footer-nav">
+        <a href="privacy.html">Privacy &amp; Terms</a>
+        <span class="dot">•</span>
+        <a href="about.html">About Us</a>
+        <span class="dot">•</span>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/calculator.js"></script>
+</body>
+</html>
