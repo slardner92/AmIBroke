@@ -371,6 +371,53 @@ body {
   background: rgba(28, 28, 245, 0.07);
 }
 
+/* ---- Bedroom selector (renter-only) ---- */
+.bedroom-select {
+  margin-top: 14px;
+}
+
+.bedroom-select[hidden] {
+  display: none;
+}
+
+.bedroom-select__label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.bedroom-select__options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.br-btn {
+  padding: 6px 14px;
+  border: 1.5px solid var(--blue);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--blue);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.br-btn--active {
+  background: var(--blue);
+  color: var(--white);
+}
+
+.br-btn:not(.br-btn--active):hover {
+  background: rgba(28, 28, 245, 0.07);
+}
+
 /* ============================================
    RESULTS SECTION
    ============================================ */
@@ -561,6 +608,30 @@ body {
 
 .stat--positive .stat__value { color: #16a34a; }
 .stat--negative .stat__value { color: #dc2626; }
+
+/* ---- Rent insight card ---- */
+.rent-insight {
+  width: 100%;
+  background: #eef2ff;
+  border: 2px solid var(--blue);
+  border-radius: 16px;
+  padding: 24px 28px;
+}
+
+.rent-insight__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.rent-insight__body {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #333;
+}
 
 @media (max-width: 600px) {
   .results-section    { padding: 60px 24px; }
