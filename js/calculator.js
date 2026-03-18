@@ -211,23 +211,51 @@ function renderResults(data) {
     </div>
   `).join('');
 
-  // Rent insight block (renter + failed housing + HUD data available)
+  // Rent insight chart (renter + failed housing + HUD data available)
   let rentInsightHtml = '';
   if (rentInsightData?.typicalRent) {
     const { typicalRent } = rentInsightData;
-    const brLabel  = { br0: 'studio', br1: '1-bedroom', br2: '2-bedroom', br3: '3-bedroom', br4: '4-bedroom' }[bedroomKey];
-    const diffPct  = Math.round(Math.abs((housing - typicalRent) / typicalRent) * 100);
-    const direction = housing >= typicalRent ? 'above' : 'below';
+    const brLabel   = { br0: 'studio', br1: '1-bedroom', br2: '2-bedroom', br3: '3-bedroom', br4: '4-bedroom' }[bedroomKey];
+    const isOver    = housing > typicalRent;
+    const diffPct   = Math.round(Math.abs((housing - typicalRent) / typicalRent) * 100);
+    const direction = isOver ? 'above' : 'below';
+
+    // Benchmark sits at 65% of the track width; user bar scales from that anchor
+    const BENCH_POS = 65;
+    const barPct    = Math.min((housing / typicalRent) * BENCH_POS, 100);
 
     rentInsightHtml = `
       <div class="rent-insight">
         <p class="rent-insight__label">📍 Local Rent Context</p>
-        <p class="rent-insight__body">
-          The typical rent for a <strong>${brLabel}</strong> in ZIP ${zip} is
-          <strong>${formatCurrency(typicalRent)}</strong>.
-          You are paying <strong>${formatCurrency(housing)}</strong> —
-          <strong>${diffPct}% ${direction}</strong> the local benchmark.
-        </p>
+
+        <div class="rent-chart">
+
+          <div class="rent-chart__header">
+            <div class="rent-chart__col">
+              <span class="rent-chart__col-label">Your Rent</span>
+              <span class="rent-chart__col-amount ${isOver ? 'rent-chart__col-amount--over' : 'rent-chart__col-amount--under'}">${formatCurrency(housing)}</span>
+            </div>
+            <div class="rent-chart__badge ${isOver ? 'rent-chart__badge--over' : 'rent-chart__badge--under'}">
+              ${diffPct}% ${direction}
+            </div>
+            <div class="rent-chart__col rent-chart__col--right">
+              <span class="rent-chart__col-label">Area Benchmark · ${brLabel} · ZIP ${zip}</span>
+              <span class="rent-chart__col-amount">${formatCurrency(typicalRent)}</span>
+            </div>
+          </div>
+
+          <div class="rent-chart__track">
+            <div class="rent-chart__fill ${isOver ? 'rent-chart__fill--over' : ''}" style="width:${barPct}%"></div>
+            <div class="rent-chart__benchmark-line" style="left:${BENCH_POS}%"></div>
+            <div class="rent-chart__benchmark-dot"  style="left:${BENCH_POS}%"></div>
+          </div>
+
+          <div class="rent-chart__scale">
+            <span>$0</span>
+            <span>${formatCurrency(Math.round(typicalRent / BENCH_POS * 100))}</span>
+          </div>
+
+        </div>
       </div>
     `;
   }

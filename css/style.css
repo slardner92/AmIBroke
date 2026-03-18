@@ -609,13 +609,13 @@ body {
 .stat--positive .stat__value { color: #16a34a; }
 .stat--negative .stat__value { color: #dc2626; }
 
-/* ---- Rent insight card ---- */
+/* ---- Rent insight card + chart ---- */
 .rent-insight {
   width: 100%;
   background: #eef2ff;
   border: 2px solid var(--blue);
   border-radius: 16px;
-  padding: 24px 28px;
+  padding: 28px 32px;
 }
 
 .rent-insight__label {
@@ -624,13 +624,120 @@ body {
   color: var(--blue);
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
-.rent-insight__body {
-  font-size: 15px;
-  line-height: 1.75;
-  color: #333;
+/* Chart layout */
+.rent-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Header: left label / badge / right label */
+.rent-chart__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rent-chart__col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rent-chart__col--right {
+  text-align: right;
+}
+
+.rent-chart__col-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rent-chart__col-amount {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--dark);
+}
+
+.rent-chart__col-amount--over  { color: #dc2626; }
+.rent-chart__col-amount--under { color: #16a34a; }
+
+/* Centre badge */
+.rent-chart__badge {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.rent-chart__badge--over  { background: #fee2e2; color: #dc2626; }
+.rent-chart__badge--under { background: #dcfce7; color: #16a34a; }
+
+/* Track */
+.rent-chart__track {
+  position: relative;
+  height: 22px;
+  background: rgba(28, 28, 245, 0.12);
+  border-radius: 11px;
+  overflow: visible;
+}
+
+.rent-chart__fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 11px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rent-chart__fill--over {
+  background: #ef4444;
+}
+
+/* Benchmark marker */
+.rent-chart__benchmark-line {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  width: 3px;
+  background: var(--dark);
+  transform: translateX(-50%);
+  border-radius: 2px;
+  z-index: 2;
+}
+
+.rent-chart__benchmark-dot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  background: var(--dark);
+  border: 2px solid #eef2ff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+/* Scale labels */
+.rent-chart__scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray);
 }
 
 @media (max-width: 600px) {
