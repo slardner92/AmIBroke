@@ -706,6 +706,33 @@ body {
 .rent-chart__badge--over  { background: #fee2e2; color: #dc2626; }
 .rent-chart__badge--under { background: #dcfce7; color: #16a34a; }
 
+/* ZORI trend line */
+.rent-trend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--dark);
+}
+
+.rent-trend--falling { background: #dcfce7; }
+.rent-trend--rising  { background: #fef3c7; }
+.rent-trend--flat    { background: #f0f4ff; }
+
+.rent-trend__arrow {
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rent-trend--falling .rent-trend__arrow { color: #16a34a; }
+.rent-trend--rising  .rent-trend__arrow { color: #d97706; }
+.rent-trend--flat    .rent-trend__arrow { color: var(--gray); }
+
 /* Overpaying nudge */
 .rent-nudge {
   display: flex;

@@ -127,22 +127,34 @@ function showLoading() {
   results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ---- Rent insight: HUD SAFMR lookup ----
+// ---- Rent insight: HUD SAFMR + Zillow ZORI lookup ----
 
 /**
- * Looks up the bedroom-specific SAFMR (federal rent benchmark) for a ZIP code.
- * Both the "typical rent" figure and any comparison are drawn from the same
- * bedroom-specific dataset, avoiding mixed-data inconsistencies.
+ * Looks up the bedroom-specific SAFMR (federal rent benchmark) for a ZIP code,
+ * plus Zillow ZORI trend data (current market rent & YoY % change).
  */
 async function fetchRentInsight(zip, brKey) {
   try {
-    if (!fetchRentInsight._cache) {
-      const res = await fetch('data/hud_50pct.json');
-      fetchRentInsight._cache = await res.json();
+    // Load both datasets in parallel (cached after first call)
+    if (!fetchRentInsight._hudCache) {
+      fetchRentInsight._hudPromise = fetchRentInsight._hudPromise || fetch('data/hud_50pct.json').then(r => r.json());
+      fetchRentInsight._hudCache = await fetchRentInsight._hudPromise;
     }
-    const entry = fetchRentInsight._cache[zip];
-    const typicalRent = entry?.[brKey] ?? null;
-    return typicalRent !== null ? { typicalRent } : null;
+    if (!fetchRentInsight._zoriCache) {
+      fetchRentInsight._zoriPromise = fetchRentInsight._zoriPromise || fetch('data/zori_trends.json').then(r => r.json());
+      fetchRentInsight._zoriCache = await fetchRentInsight._zoriPromise;
+    }
+
+    const hudEntry  = fetchRentInsight._hudCache[zip];
+    const zoriEntry = fetchRentInsight._zoriCache[zip];
+
+    const typicalRent = hudEntry?.[brKey] ?? null;
+
+    return typicalRent !== null ? {
+      typicalRent,
+      zoriRent: zoriEntry?.rent ?? null,
+      zoriYoY:  zoriEntry?.yoy  ?? null,
+    } : null;
   } catch (_) {
     return null;
   }
@@ -214,7 +226,7 @@ function renderResults(data) {
   // Rent insight chart (renter + failed housing + HUD data available)
   let rentInsightHtml = '';
   if (rentInsightData?.typicalRent) {
-    const { typicalRent } = rentInsightData;
+    const { typicalRent, zoriRent, zoriYoY } = rentInsightData;
     const brLabel   = { br0: 'studio', br1: '1-bedroom', br2: '2-bedroom', br3: '3-bedroom', br4: '4-bedroom' }[bedroomKey];
     const isOver    = housing > typicalRent;
     const diffPct   = Math.round(Math.abs((housing - typicalRent) / typicalRent) * 100);
@@ -224,6 +236,52 @@ function renderResults(data) {
     const maxVal    = Math.max(housing, typicalRent);
     const userPct   = (housing / maxVal) * 100;
     const benchPct  = (typicalRent / maxVal) * 100;
+
+    // ZORI trend line (optional — only for ZIPs Zillow covers)
+    let zoriTrendHtml = '';
+    if (zoriRent !== null) {
+      const hasYoY     = zoriYoY !== null;
+      const isFalling  = hasYoY && zoriYoY < 0;
+      const isRising   = hasYoY && zoriYoY > 0;
+      const absYoY     = hasYoY ? Math.abs(zoriYoY) : 0;
+      const arrowIcon  = isFalling ? '↓' : isRising ? '↑' : '→';
+      const trendClass = isFalling ? 'rent-trend--falling' : isRising ? 'rent-trend--rising' : 'rent-trend--flat';
+
+      zoriTrendHtml = `
+        <div class="rent-trend ${trendClass}">
+          <span class="rent-trend__arrow">${arrowIcon}</span>
+          <span class="rent-trend__text">
+            Zillow market rent in ZIP ${zip}: <strong>${formatCurrency(zoriRent)}/mo</strong>${hasYoY ? ` — <strong>${isFalling ? 'down' : isRising ? 'up' : 'flat'} ${absYoY}%</strong> year-over-year` : ''}
+          </span>
+        </div>
+      `;
+    }
+
+    // Nudge for overpayers — enhanced with ZORI trend if available
+    let nudgeHtml = '';
+    if (isOver) {
+      let nudgeText = '';
+      const isFalling = zoriYoY !== null && zoriYoY < 0;
+      const absYoY    = zoriYoY !== null ? Math.abs(zoriYoY) : 0;
+
+      if (isFalling) {
+        nudgeText = `Good news: rents in your area have <strong>dropped ${absYoY}%</strong> over the past year according to Zillow. That means landlords are competing for tenants — and you have real leverage. Check <strong>Zillow</strong>, <strong>Apartments.com</strong>, and <strong>Facebook Marketplace</strong> for current ${brLabel} listings in ZIP ${zip}, and use those prices to negotiate your next renewal.`;
+      } else if (zoriYoY !== null && zoriYoY >= 0 && zoriYoY <= 2) {
+        nudgeText = `Rents in your area have been <strong>roughly flat</strong> over the past year — which means landlords have less justification for big increases. Shop around on <strong>Zillow</strong>, <strong>Apartments.com</strong>, and <strong>Facebook Marketplace</strong> for current ${brLabel} listings in ZIP ${zip} to see what's available for less.`;
+      } else {
+        nudgeText = `Units comparable to yours are available in ZIP ${zip} for less. Landlords rarely volunteer a discount, but market conditions shift constantly. Check <strong>Zillow</strong>, <strong>Apartments.com</strong>, and <strong>Facebook Marketplace</strong> for current ${brLabel} listings, and don't be afraid to negotiate your next renewal.`;
+      }
+
+      nudgeHtml = `
+        <div class="rent-nudge">
+          <p class="rent-nudge__icon">🔍</p>
+          <div class="rent-nudge__body">
+            <p class="rent-nudge__title">You may be overpaying — it's worth shopping around.</p>
+            <p class="rent-nudge__text">${nudgeText}</p>
+          </div>
+        </div>
+      `;
+    }
 
     rentInsightHtml = `
       <div class="rent-insight">
@@ -256,15 +314,8 @@ function renderResults(data) {
 
         </div>
 
-        ${isOver ? `
-        <div class="rent-nudge">
-          <p class="rent-nudge__icon">🔍</p>
-          <div class="rent-nudge__body">
-            <p class="rent-nudge__title">You may be overpaying — it's worth shopping around.</p>
-            <p class="rent-nudge__text">Units comparable to yours are available in ZIP ${zip} for less. Landlords rarely volunteer a discount, but vacancy rates are up in many markets right now — meaning you have more leverage than you think. Check <strong>Zillow</strong>, <strong>Apartments.com</strong>, and <strong>Facebook Marketplace</strong> for current listings, and don't be afraid to negotiate your next renewal.</p>
-          </div>
-        </div>
-        ` : ''}
+        ${zoriTrendHtml}
+        ${nudgeHtml}
 
       </div>
     `;

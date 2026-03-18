@@ -30,3 +30,5 @@ htmlcov/
 .idea/
 .vscode/
 *.swp
+data/zori_zip.csv
+data/fy2026_safmrs.xlsx
