@@ -627,116 +627,111 @@ body {
   margin-bottom: 20px;
 }
 
-/* Chart layout */
+/* Chart layout — stacked bars */
 .rent-chart {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-/* Header: left label / badge / right label */
-.rent-chart__header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
+/* Each bar row: label | track | amount */
+.rent-chart__row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  align-items: center;
+  gap: 14px;
 }
 
-.rent-chart__col {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.rent-chart__col--right {
-  text-align: right;
-}
-
-.rent-chart__col-label {
-  font-size: 11px;
+.rent-chart__row-label {
+  font-size: 12px;
   font-weight: 700;
   color: var(--gray);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.rent-chart__col-amount {
-  font-size: 24px;
+.rent-chart__row-amount {
+  font-size: 18px;
   font-weight: 800;
   color: var(--dark);
+  min-width: 80px;
+  text-align: right;
 }
 
-.rent-chart__col-amount--over  { color: #dc2626; }
-.rent-chart__col-amount--under { color: #16a34a; }
+.rent-chart__row-amount--over  { color: #dc2626; }
+.rent-chart__row-amount--under { color: #16a34a; }
 
-/* Centre badge */
+/* Track */
+.rent-chart__track {
+  height: 28px;
+  background: rgba(28, 28, 245, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.rent-chart__fill {
+  height: 100%;
+  border-radius: 14px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rent-chart__fill--over  { background: #ef4444; }
+.rent-chart__fill--under { background: #16a34a; }
+.rent-chart__fill--bench { background: var(--blue); opacity: 0.55; }
+
+/* Footer: context label + badge */
+.rent-chart__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.rent-chart__context {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray);
+  text-transform: capitalize;
+}
+
 .rent-chart__badge {
-  flex-shrink: 0;
   font-size: 13px;
   font-weight: 800;
-  padding: 6px 14px;
+  padding: 5px 14px;
   border-radius: 20px;
   white-space: nowrap;
-  align-self: center;
 }
 
 .rent-chart__badge--over  { background: #fee2e2; color: #dc2626; }
 .rent-chart__badge--under { background: #dcfce7; color: #16a34a; }
 
-/* Track */
-.rent-chart__track {
-  position: relative;
-  height: 22px;
-  background: rgba(28, 28, 245, 0.12);
-  border-radius: 11px;
-  overflow: visible;
-}
-
-.rent-chart__fill {
-  height: 100%;
-  background: var(--blue);
-  border-radius: 11px;
-  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rent-chart__fill--over {
-  background: #ef4444;
-}
-
-/* Benchmark marker */
-.rent-chart__benchmark-line {
-  position: absolute;
-  top: -6px;
-  bottom: -6px;
-  width: 3px;
-  background: var(--dark);
-  transform: translateX(-50%);
-  border-radius: 2px;
-  z-index: 2;
-}
-
-.rent-chart__benchmark-dot {
-  position: absolute;
-  top: 50%;
-  width: 12px;
-  height: 12px;
-  background: var(--dark);
-  border: 2px solid #eef2ff;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 3;
-}
-
-/* Scale labels */
-.rent-chart__scale {
+/* Overpaying nudge */
+.rent-nudge {
   display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  font-weight: 600;
+  gap: 14px;
+  align-items: flex-start;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1.5px dashed rgba(28, 28, 245, 0.2);
+}
+
+.rent-nudge__icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.rent-nudge__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+
+.rent-nudge__text {
+  font-size: 13px;
+  line-height: 1.65;
   color: var(--gray);
 }
 

@@ -220,9 +220,10 @@ function renderResults(data) {
     const diffPct   = Math.round(Math.abs((housing - typicalRent) / typicalRent) * 100);
     const direction = isOver ? 'above' : 'below';
 
-    // Benchmark sits at 65% of the track width; user bar scales from that anchor
-    const BENCH_POS = 65;
-    const barPct    = Math.min((housing / typicalRent) * BENCH_POS, 100);
+    // Both bars scale relative to whichever value is larger
+    const maxVal    = Math.max(housing, typicalRent);
+    const userPct   = (housing / maxVal) * 100;
+    const benchPct  = (typicalRent / maxVal) * 100;
 
     rentInsightHtml = `
       <div class="rent-insight">
@@ -230,32 +231,41 @@ function renderResults(data) {
 
         <div class="rent-chart">
 
-          <div class="rent-chart__header">
-            <div class="rent-chart__col">
-              <span class="rent-chart__col-label">Your Rent</span>
-              <span class="rent-chart__col-amount ${isOver ? 'rent-chart__col-amount--over' : 'rent-chart__col-amount--under'}">${formatCurrency(housing)}</span>
+          <div class="rent-chart__row">
+            <span class="rent-chart__row-label">Your Rent</span>
+            <div class="rent-chart__track">
+              <div class="rent-chart__fill ${isOver ? 'rent-chart__fill--over' : 'rent-chart__fill--under'}" style="width:${userPct}%"></div>
             </div>
-            <div class="rent-chart__badge ${isOver ? 'rent-chart__badge--over' : 'rent-chart__badge--under'}">
+            <span class="rent-chart__row-amount ${isOver ? 'rent-chart__row-amount--over' : 'rent-chart__row-amount--under'}">${formatCurrency(housing)}</span>
+          </div>
+
+          <div class="rent-chart__row">
+            <span class="rent-chart__row-label">Area Benchmark</span>
+            <div class="rent-chart__track">
+              <div class="rent-chart__fill rent-chart__fill--bench" style="width:${benchPct}%"></div>
+            </div>
+            <span class="rent-chart__row-amount">${formatCurrency(typicalRent)}</span>
+          </div>
+
+          <div class="rent-chart__footer">
+            <span class="rent-chart__context">${brLabel} · ZIP ${zip}</span>
+            <span class="rent-chart__badge ${isOver ? 'rent-chart__badge--over' : 'rent-chart__badge--under'}">
               ${diffPct}% ${direction}
-            </div>
-            <div class="rent-chart__col rent-chart__col--right">
-              <span class="rent-chart__col-label">Area Benchmark · ${brLabel} · ZIP ${zip}</span>
-              <span class="rent-chart__col-amount">${formatCurrency(typicalRent)}</span>
-            </div>
-          </div>
-
-          <div class="rent-chart__track">
-            <div class="rent-chart__fill ${isOver ? 'rent-chart__fill--over' : ''}" style="width:${barPct}%"></div>
-            <div class="rent-chart__benchmark-line" style="left:${BENCH_POS}%"></div>
-            <div class="rent-chart__benchmark-dot"  style="left:${BENCH_POS}%"></div>
-          </div>
-
-          <div class="rent-chart__scale">
-            <span>$0</span>
-            <span>${formatCurrency(Math.round(typicalRent / BENCH_POS * 100))}</span>
+            </span>
           </div>
 
         </div>
+
+        ${isOver ? `
+        <div class="rent-nudge">
+          <p class="rent-nudge__icon">🔍</p>
+          <div class="rent-nudge__body">
+            <p class="rent-nudge__title">You may be overpaying — it's worth shopping around.</p>
+            <p class="rent-nudge__text">Units comparable to yours are available in ZIP ${zip} for less. Landlords rarely volunteer a discount, but vacancy rates are up in many markets right now — meaning you have more leverage than you think. Check <strong>Zillow</strong>, <strong>Apartments.com</strong>, and <strong>Facebook Marketplace</strong> for current listings, and don't be afraid to negotiate your next renewal.</p>
+          </div>
+        </div>
+        ` : ''}
+
       </div>
     `;
   }
