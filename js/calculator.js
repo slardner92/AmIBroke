@@ -87,7 +87,7 @@ const RESOURCES = {
   },
   hysa: {
     icon: '🛡️', title: 'Compare High-Yield Savings',
-    desc: 'Top accounts currently earning 4-5% APY',
+    desc: 'Top accounts currently earning up to 4% APY',
     url: 'https://www.nerdwallet.com/best/banking/high-yield-online-savings-accounts', cta: 'COMPARE →',
   },
   investing: {
@@ -268,7 +268,7 @@ function buildPathB(freeCashFlow, monthlyIncome, totalMonthlyDebt, car, debt) {
         </div>
       </div>
       <ul class="action-card__tips">
-        <li>Open a high-yield savings account — they're currently paying 4-5% APY, far better than a regular checking account</li>
+        <li>Open a high-yield savings account — top accounts are currently paying up to 4% APY, far better than a regular checking account</li>
         <li>Automate a monthly transfer — even ${formatCurrency(Math.min(200, freeCashFlow))}/mo adds up fast</li>
       </ul>
       ${resourceCardHtml('hysa')}
