@@ -78,7 +78,7 @@ const RESOURCES = {
   refinanceCar: {
     icon: '🚗', title: 'Check Auto Refinance Rates',
     desc: 'See if you qualify for a lower monthly payment',
-    url: 'https://www.credible.com/auto-refinancing', cta: 'CHECK RATES →',
+    url: 'https://www.credible.com/auto-refinance', cta: 'CHECK RATES →',
   },
   debtPayoff: {
     icon: '📊', title: 'Build a Debt Payoff Plan',
@@ -98,7 +98,7 @@ const RESOURCES = {
   budget: {
     icon: '📝', title: 'Try a Budgeting App',
     desc: 'Track spending and find where your money goes',
-    url: 'https://www.nerdwallet.com/best/banking/budgeting-apps', cta: 'BROWSE →',
+    url: 'https://www.nerdwallet.com/finance/learn/best-budget-apps', cta: 'BROWSE →',
   },
 };
 
