@@ -192,6 +192,31 @@ body {
   margin-top: 12px;
   display: block;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: judge-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes judge-pulse {
+  0%, 100% { box-shadow: 0 4px 24px rgba(28, 28, 245, 0.35); }
+  50%       { box-shadow: 0 6px 36px rgba(28, 28, 245, 0.55), 0 0 0 8px rgba(28, 28, 245, 0.08); }
+}
+
+.btn-judge::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-20deg);
+  animation: judge-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes judge-shimmer {
+  0%   { left: -60%; }
+  100% { left: 130%; }
 }
 
 /* ============================================
@@ -298,21 +323,23 @@ body {
 }
 
 .form-group input {
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid rgba(28, 28, 245, 0.15);
-  padding: 10px 0;
+  background: rgba(28, 28, 245, 0.03);
+  border: 2px solid rgba(28, 28, 245, 0.18);
+  border-radius: 10px;
+  padding: 12px 16px;
   font-size: 30px;
   font-weight: 700;
   color: var(--dark);
   font-family: 'Inter', sans-serif;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   width: 100%;
 }
 
 .form-group input:focus {
-  border-bottom-color: var(--blue);
+  border-color: var(--blue);
+  background: rgba(28, 28, 245, 0.06);
+  box-shadow: 0 0 0 4px rgba(28, 28, 245, 0.1);
 }
 
 .form-group input::placeholder {
