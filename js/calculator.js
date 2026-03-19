@@ -91,9 +91,9 @@ const RESOURCES = {
     url: 'https://www.nerdwallet.com/best/banking/high-yield-online-savings-accounts', cta: 'COMPARE →',
   },
   investing: {
-    icon: '📈', title: 'Start Investing',
-    desc: 'Beginner-friendly brokerage accounts compared',
-    url: 'https://www.nerdwallet.com/best/investing/online-brokers-for-beginners', cta: 'EXPLORE →',
+    icon: '📈', title: 'Start Investing with Betterment',
+    desc: 'Hands-off investing — set a goal, they handle the rest',
+    url: 'https://www.betterment.com', cta: 'GET STARTED →',
   },
   budget: {
     icon: '📝', title: 'Try a Budgeting App',
