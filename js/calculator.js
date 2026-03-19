@@ -133,7 +133,8 @@ function buildNextStepsHtml(data, tests) {
 
 function buildPathA(data, tests) {
   const { housingRatio, housingBenchmark, housingType, monthlyIncome,
-          housing, car, debt, totalMonthlyDebt, totalDebtRatio } = data;
+          housing, car, debt, totalMonthlyDebt, totalDebtRatio,
+          rentInsightData } = data;
 
   const cards = [];
   const housingFailed = housingRatio > housingBenchmark;
@@ -146,12 +147,18 @@ function buildPathA(data, tests) {
     const housingCut    = Math.ceil(housing - targetHousing);
     const isRenter      = housingType === 'rent';
 
-    const tips = isRenter
-      ? [
-          'Negotiate your next lease renewal — many landlords will lower rent rather than deal with vacancy',
-          'Consider a roommate to split costs, even temporarily',
-          'Explore neighborhoods 10-15 min further out where rents tend to drop significantly',
-        ]
+    // Nearest falling-rent ZIP tip (renters only)
+    const nearestFalling = rentInsightData?.nearestFalling ?? null;
+    const nearbyTip = nearestFalling
+      ? `ZIP ${nearestFalling.zip} (${nearestFalling.miles} miles away) has seen rents fall ${Math.abs(nearestFalling.yoy)}% over the past year — worth checking listings there`
+      : null;
+
+    const renterTips = [
+      'Negotiate your next lease renewal — many landlords will lower rent rather than deal with vacancy',
+      ...(nearbyTip ? [nearbyTip] : []),
+    ];
+
+    const tips = isRenter ? renterTips
       : [
           'Look into refinancing your mortgage if rates have dropped since you locked in',
           'Consider recasting your mortgage with a lump-sum principal payment',
@@ -394,29 +401,67 @@ function showLoading() {
  */
 async function fetchRentInsight(zip, brKey) {
   try {
-    // Load both datasets in parallel (cached after first call)
-    if (!fetchRentInsight._hudCache) {
-      fetchRentInsight._hudPromise = fetchRentInsight._hudPromise || fetch('data/hud_50pct.json').then(r => r.json());
-      fetchRentInsight._hudCache = await fetchRentInsight._hudPromise;
-    }
-    if (!fetchRentInsight._zoriCache) {
-      fetchRentInsight._zoriPromise = fetchRentInsight._zoriPromise || fetch('data/zori_trends.json').then(r => r.json());
-      fetchRentInsight._zoriCache = await fetchRentInsight._zoriPromise;
-    }
+    // Load all three datasets in parallel (cached after first call)
+    fetchRentInsight._hudPromise  = fetchRentInsight._hudPromise  || fetch('data/hud_50pct.json').then(r => r.json());
+    fetchRentInsight._zoriPromise = fetchRentInsight._zoriPromise || fetch('data/zori_trends.json').then(r => r.json());
+    fetchRentInsight._coordPromise= fetchRentInsight._coordPromise|| fetch('data/zip_coords.json').then(r => r.json());
+
+    if (!fetchRentInsight._hudCache)   fetchRentInsight._hudCache   = await fetchRentInsight._hudPromise;
+    if (!fetchRentInsight._zoriCache)  fetchRentInsight._zoriCache  = await fetchRentInsight._zoriPromise;
+    if (!fetchRentInsight._coordCache) fetchRentInsight._coordCache = await fetchRentInsight._coordPromise;
 
     const hudEntry  = fetchRentInsight._hudCache[zip];
     const zoriEntry = fetchRentInsight._zoriCache[zip];
-
     const typicalRent = hudEntry?.[brKey] ?? null;
 
-    return typicalRent !== null ? {
+    if (typicalRent === null) return null;
+
+    // Find nearest ZIP with falling rents within 30 miles
+    const nearestFalling = findNearestFallingZip(zip,
+      fetchRentInsight._coordCache,
+      fetchRentInsight._zoriCache);
+
+    return {
       typicalRent,
-      zoriRent: zoriEntry?.rent ?? null,
-      zoriYoY:  zoriEntry?.yoy  ?? null,
-    } : null;
+      zoriRent:      zoriEntry?.rent    ?? null,
+      zoriYoY:       zoriEntry?.yoy     ?? null,
+      nearestFalling,
+    };
   } catch (_) {
     return null;
   }
+}
+
+function haversineMiles(lat1, lng1, lat2, lng2) {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+function findNearestFallingZip(userZip, coords, zori) {
+  const userCoord = coords[userZip];
+  if (!userCoord) return null;
+  const [uLat, uLng] = userCoord;
+
+  let best = null;
+  let bestDist = Infinity;
+
+  for (const [zip, entry] of Object.entries(zori)) {
+    if (zip === userZip) continue;
+    if (!entry.yoy || entry.yoy >= 0) continue; // only falling
+    const c = coords[zip];
+    if (!c) continue;
+    const dist = haversineMiles(uLat, uLng, c[0], c[1]);
+    if (dist <= 30 && dist < bestDist) {
+      bestDist = dist;
+      best = { zip, yoy: entry.yoy, miles: Math.round(dist * 10) / 10 };
+    }
+  }
+  return best;
 }
 
 // ---- Verdict logic ----
