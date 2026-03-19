@@ -83,7 +83,7 @@ const RESOURCES = {
   debtPayoff: {
     icon: '📊', title: 'Build a Debt Payoff Plan',
     desc: 'Free calculator to map out your debt-free date',
-    url: 'https://www.nerdwallet.com/article/finance/debt-payoff-calculator', cta: 'CALCULATE →',
+    url: 'https://www.nerdwallet.com/personal-loans/learn/pay-off-debt', cta: 'CALCULATE →',
   },
   hysa: {
     icon: '🛡️', title: 'Compare High-Yield Savings',
