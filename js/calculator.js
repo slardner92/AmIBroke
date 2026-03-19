@@ -204,7 +204,7 @@ function getVerdict(housingRatio, totalDebtRatio, housingBenchmark, housingType)
 function renderResults(data) {
   const { housingRatio, totalDebtRatio, housingBenchmark, housingType,
           monthlyIncome, freeCashFlow, totalMonthlyDebt,
-          housing, zip, bedroomKey, rentInsightData } = data;
+          housing, car, salary, zip, bedroomKey, rentInsightData } = data;
 
   const { verdict, tagline, verdictClass, tests } = getVerdict(
     housingRatio, totalDebtRatio, housingBenchmark, housingType
@@ -321,6 +321,58 @@ function renderResults(data) {
     `;
   }
 
+  // Car payment insight (fails 43% rule + car is a significant contributor)
+  let carInsightHtml = '';
+  const carPct = (car / monthlyIncome) * 100;
+  const guidelineCar = monthlyIncome * 0.10;
+  if (totalDebtRatio > 43 && car > 0 && carPct > 10) {
+    const carMaxVal  = Math.max(car, guidelineCar);
+    const carUserPct = (car / carMaxVal) * 100;
+    const carBenchPct = (guidelineCar / carMaxVal) * 100;
+    const carOverPct = Math.round(((car - guidelineCar) / guidelineCar) * 100);
+
+    // How much would they need to cut to pass 43%?
+    const excessDebt   = totalMonthlyDebt - (monthlyIncome * 0.43);
+    const carCutNeeded = Math.min(Math.ceil(excessDebt), car); // can't cut more than the full payment
+
+    carInsightHtml = `
+      <div class="car-insight">
+        <p class="car-insight__label">🚗 Car Payment Check</p>
+
+        <div class="car-chart">
+          <div class="car-chart__row">
+            <span class="car-chart__row-label">Your Payment</span>
+            <div class="car-chart__track">
+              <div class="car-chart__fill car-chart__fill--over" style="width:${carUserPct}%"></div>
+            </div>
+            <span class="car-chart__row-amount car-chart__row-amount--over">${formatCurrency(car)}</span>
+          </div>
+
+          <div class="car-chart__row">
+            <span class="car-chart__row-label">10% Guideline</span>
+            <div class="car-chart__track">
+              <div class="car-chart__fill car-chart__fill--bench" style="width:${carBenchPct}%"></div>
+            </div>
+            <span class="car-chart__row-amount">${formatCurrency(guidelineCar)}</span>
+          </div>
+
+          <div class="car-chart__footer">
+            <span class="car-chart__context">Based on ${formatCurrency(salary)} gross salary</span>
+            <span class="car-chart__badge car-chart__badge--over">${carOverPct}% above</span>
+          </div>
+        </div>
+
+        <div class="car-nudge">
+          <p class="car-nudge__icon">🎯</p>
+          <div class="car-nudge__body">
+            <p class="car-nudge__title">Reducing your payment by ${formatCurrency(carCutNeeded)}/mo would get you under 43%.</p>
+            <p class="car-nudge__text">Consider refinancing for a lower rate, extending your term (if you can), or trading into a less expensive vehicle. Even a 1-2% rate reduction on a $30K balance can save $50-80/mo.</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   const cashFlowClass  = freeCashFlow >= 0 ? 'stat--positive' : 'stat--negative';
   const cashFlowPrefix = freeCashFlow >= 0 ? '+' : '';
 
@@ -340,6 +392,8 @@ function renderResults(data) {
       </div>
 
       ${rentInsightHtml}
+
+      ${carInsightHtml}
 
       <div class="result-stats">
         <div class="stat">

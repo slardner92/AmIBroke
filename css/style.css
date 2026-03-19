@@ -762,6 +762,121 @@ body {
   color: var(--gray);
 }
 
+/* ---- Car payment insight card ---- */
+.car-insight {
+  background: #fff;
+  border: 2px solid rgba(28, 28, 245, 0.12);
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  margin-top: 24px;
+}
+
+.car-insight__label {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 20px;
+}
+
+.car-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.car-chart__row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.car-chart__row-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray);
+}
+
+.car-chart__track {
+  height: 22px;
+  background: rgba(28, 28, 245, 0.08);
+  border-radius: 11px;
+  overflow: hidden;
+}
+
+.car-chart__fill {
+  height: 100%;
+  border-radius: 11px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.car-chart__fill--over  { background: #dc2626; }
+.car-chart__fill--bench { background: var(--blue); opacity: 0.7; }
+
+.car-chart__row-amount {
+  font-size: 15px;
+  font-weight: 800;
+  min-width: 60px;
+  text-align: right;
+}
+
+.car-chart__row-amount--over { color: #dc2626; }
+
+.car-chart__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.car-chart__context {
+  font-size: 12px;
+  color: var(--gray);
+  font-weight: 600;
+}
+
+.car-chart__badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.car-chart__badge--over { background: #fee2e2; color: #dc2626; }
+
+.car-nudge {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1.5px dashed rgba(28, 28, 245, 0.2);
+}
+
+.car-nudge__icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.car-nudge__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+
+.car-nudge__text {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--gray);
+}
+
 @media (max-width: 600px) {
   .results-section    { padding: 60px 24px; }
   .verdict            { padding: 36px 24px; }
