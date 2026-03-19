@@ -67,6 +67,265 @@ function formatPercent(n) {
   return n.toFixed(1) + '%';
 }
 
+// ---- Resource links (affiliate-ready) ----
+
+const RESOURCES = {
+  apartments: {
+    icon: '🏠', title: 'Search Apartments Near You',
+    desc: 'Compare current rental listings in your area',
+    url: 'https://www.apartments.com', cta: 'SEARCH →',
+  },
+  refinanceCar: {
+    icon: '🚗', title: 'Check Auto Refinance Rates',
+    desc: 'See if you qualify for a lower monthly payment',
+    url: 'https://www.credible.com/auto-refinancing', cta: 'CHECK RATES →',
+  },
+  debtPayoff: {
+    icon: '📊', title: 'Build a Debt Payoff Plan',
+    desc: 'Free calculator to map out your debt-free date',
+    url: 'https://www.nerdwallet.com/article/finance/debt-payoff-calculator', cta: 'CALCULATE →',
+  },
+  hysa: {
+    icon: '🛡️', title: 'Compare High-Yield Savings',
+    desc: 'Top accounts currently earning 4-5% APY',
+    url: 'https://www.nerdwallet.com/best/banking/high-yield-online-savings-accounts', cta: 'COMPARE →',
+  },
+  investing: {
+    icon: '📈', title: 'Start Investing',
+    desc: 'Beginner-friendly brokerage accounts compared',
+    url: 'https://www.nerdwallet.com/best/investing/online-brokers-for-beginners', cta: 'EXPLORE →',
+  },
+  budget: {
+    icon: '📝', title: 'Try a Budgeting App',
+    desc: 'Track spending and find where your money goes',
+    url: 'https://www.nerdwallet.com/best/banking/budgeting-apps', cta: 'BROWSE →',
+  },
+};
+
+function resourceCardHtml(key) {
+  const r = RESOURCES[key];
+  return `
+    <a class="action-card__resource" href="${r.url}" target="_blank" rel="noopener noreferrer">
+      <span class="action-card__resource-icon">${r.icon}</span>
+      <div class="action-card__resource-body">
+        <p class="action-card__resource-title">${r.title}</p>
+        <p class="action-card__resource-desc">${r.desc}</p>
+      </div>
+      <span class="action-card__resource-cta">${r.cta}</span>
+    </a>
+  `;
+}
+
+// ---- Next Steps builder ----
+
+function buildNextStepsHtml(data, tests) {
+  const { housingRatio, housingBenchmark, housingType, monthlyIncome,
+          freeCashFlow, totalMonthlyDebt, housing, car, debt,
+          totalDebtRatio, carRatio } = data;
+
+  const failures = tests.filter(t => !t.pass);
+
+  if (failures.length === 0) {
+    return buildPathB(freeCashFlow, monthlyIncome, totalMonthlyDebt, car, debt);
+  }
+  return buildPathA(data, tests);
+}
+
+function buildPathA(data, tests) {
+  const { housingRatio, housingBenchmark, housingType, monthlyIncome,
+          housing, car, debt, totalMonthlyDebt, totalDebtRatio } = data;
+
+  const cards = [];
+  const housingFailed = housingRatio > housingBenchmark;
+  const debtFailed    = totalDebtRatio > 43;
+  const carPct        = (car / monthlyIncome) * 100;
+
+  // Housing card
+  if (housingFailed) {
+    const targetHousing = monthlyIncome * (housingBenchmark / 100);
+    const housingCut    = Math.ceil(housing - targetHousing);
+    const isRenter      = housingType === 'rent';
+
+    const tips = isRenter
+      ? [
+          'Negotiate your next lease renewal — many landlords will lower rent rather than deal with vacancy',
+          'Consider a roommate to split costs, even temporarily',
+          'Explore neighborhoods 10-15 min further out where rents tend to drop significantly',
+        ]
+      : [
+          'Look into refinancing your mortgage if rates have dropped since you locked in',
+          'Consider recasting your mortgage with a lump-sum principal payment',
+          'Review your property tax assessment — many homeowners are over-assessed',
+        ];
+
+    cards.push(`
+      <div class="action-card action-card--housing">
+        <div class="action-card__header">
+          <span class="action-card__icon">🏠</span>
+          <div>
+            <h3 class="action-card__title">Lower Your ${isRenter ? 'Rent' : 'Mortgage Cost'}</h3>
+            <p class="action-card__subtitle">You need to save ~${formatCurrency(housingCut)}/mo to hit the ${housingBenchmark}% target</p>
+          </div>
+        </div>
+        <ul class="action-card__tips">
+          ${tips.map(t => `<li>${t}</li>`).join('')}
+        </ul>
+        ${isRenter ? resourceCardHtml('apartments') : ''}
+      </div>
+    `);
+  }
+
+  // Car card
+  if (debtFailed && car > 0 && carPct > 10) {
+    const excessDebt   = totalMonthlyDebt - (monthlyIncome * 0.43);
+    const carCutNeeded = Math.min(Math.ceil(excessDebt), car);
+
+    cards.push(`
+      <div class="action-card action-card--car">
+        <div class="action-card__header">
+          <span class="action-card__icon">🚗</span>
+          <div>
+            <h3 class="action-card__title">Trim Your Car Payment</h3>
+            <p class="action-card__subtitle">Cutting ${formatCurrency(carCutNeeded)}/mo would bring you under 43%</p>
+          </div>
+        </div>
+        <ul class="action-card__tips">
+          <li>Refinance at a lower rate — even 1-2% can save $50-80/mo on a $30K balance</li>
+          <li>Extend your loan term to reduce the monthly hit (but pay extra when you can)</li>
+          <li>Consider trading into a less expensive, reliable vehicle</li>
+        </ul>
+        ${resourceCardHtml('refinanceCar')}
+      </div>
+    `);
+  }
+
+  // Other debt card
+  if (debtFailed && debt > 0) {
+    cards.push(`
+      <div class="action-card action-card--debt">
+        <div class="action-card__header">
+          <span class="action-card__icon">💳</span>
+          <div>
+            <h3 class="action-card__title">Attack Your Other Debt</h3>
+            <p class="action-card__subtitle">Your other monthly payments (${formatCurrency(debt)}) are adding up</p>
+          </div>
+        </div>
+        <ul class="action-card__tips">
+          <li>List your debts smallest to largest and knock them out one by one (the "snowball" method)</li>
+          <li>Look into 0% intro APR balance transfer cards to stop interest from piling on</li>
+          <li>Consider consolidating multiple payments into one lower-rate loan</li>
+        </ul>
+        ${resourceCardHtml('debtPayoff')}
+      </div>
+    `);
+  }
+
+  // Budgeting card (always show for Path A)
+  cards.push(`
+    <div class="action-card action-card--budget">
+      <div class="action-card__header">
+        <span class="action-card__icon">📝</span>
+        <div>
+          <h3 class="action-card__title">Track Where Your Money Goes</h3>
+          <p class="action-card__subtitle">You can't fix what you can't see</p>
+        </div>
+      </div>
+      <ul class="action-card__tips">
+        <li>A budgeting app can reveal spending leaks you didn't know you had</li>
+        <li>Start with the 50/30/20 rule: 50% needs, 30% wants, 20% savings & debt payoff</li>
+      </ul>
+      ${resourceCardHtml('budget')}
+    </div>
+  `);
+
+  return `
+    <div class="next-steps">
+      <span class="step-label">WHAT NOW</span>
+      <h2 class="next-steps__title">Your Next Moves</h2>
+      <p class="next-steps__subtitle">Personalized actions based on your results — start with #1.</p>
+      <div class="next-steps__cards">
+        ${cards.join('')}
+      </div>
+    </div>
+  `;
+}
+
+function buildPathB(freeCashFlow, monthlyIncome, totalMonthlyDebt, car, debt) {
+  const emergencyMin = totalMonthlyDebt * 3;
+  const emergencyMax = totalMonthlyDebt * 6;
+  const investSuggest = Math.min(Math.round(freeCashFlow * 0.2), 500);
+
+  const cards = [];
+
+  // Emergency fund
+  cards.push(`
+    <div class="action-card action-card--wealth">
+      <div class="action-card__header">
+        <span class="action-card__icon">🛡️</span>
+        <div>
+          <h3 class="action-card__title">Build Your Safety Net</h3>
+          <p class="action-card__subtitle">Aim for ${formatCurrency(emergencyMin)} – ${formatCurrency(emergencyMax)} (3-6 months of expenses)</p>
+        </div>
+      </div>
+      <ul class="action-card__tips">
+        <li>Open a high-yield savings account — they're currently paying 4-5% APY, far better than a regular checking account</li>
+        <li>Automate a monthly transfer — even ${formatCurrency(Math.min(200, freeCashFlow))}/mo adds up fast</li>
+      </ul>
+      ${resourceCardHtml('hysa')}
+    </div>
+  `);
+
+  // Investing
+  cards.push(`
+    <div class="action-card action-card--wealth">
+      <div class="action-card__header">
+        <span class="action-card__icon">📈</span>
+        <div>
+          <h3 class="action-card__title">Put Your Money to Work</h3>
+          <p class="action-card__subtitle">Even ${formatCurrency(investSuggest)}/mo invested consistently can grow to six figures</p>
+        </div>
+      </div>
+      <ul class="action-card__tips">
+        <li>If your employer offers a 401(k) match, contribute enough to get the full match — it's free money</li>
+        <li>Low-cost index funds (like a total market fund) are the simplest starting point</li>
+        <li>Time in the market beats timing the market — starting now matters more than starting perfectly</li>
+      </ul>
+      ${resourceCardHtml('investing')}
+    </div>
+  `);
+
+  // Accelerate debt payoff (conditional)
+  if (car > 0 || debt > 0) {
+    cards.push(`
+      <div class="action-card action-card--wealth">
+        <div class="action-card__header">
+          <span class="action-card__icon">🎯</span>
+          <div>
+            <h3 class="action-card__title">Accelerate Debt Payoff</h3>
+            <p class="action-card__subtitle">Extra payments now = less interest over time</p>
+          </div>
+        </div>
+        <ul class="action-card__tips">
+          <li>Put extra cash toward your highest-interest debt first (the "avalanche" method)</li>
+          <li>Even an extra $100/mo on a car loan can shave months off and save hundreds in interest</li>
+        </ul>
+        ${resourceCardHtml('debtPayoff')}
+      </div>
+    `);
+  }
+
+  return `
+    <div class="next-steps">
+      <span class="step-label">WHAT NOW</span>
+      <h2 class="next-steps__title">Your Next Moves</h2>
+      <p class="next-steps__subtitle">You have ${formatCurrency(freeCashFlow)}/mo in free cash flow — here's how to make it work harder.</p>
+      <div class="next-steps__cards">
+        ${cards.join('')}
+      </div>
+    </div>
+  `;
+}
+
 // ---- Form submit (async) ----
 
 form.addEventListener('submit', async function (e) {
@@ -376,6 +635,9 @@ function renderResults(data) {
   const cashFlowClass  = freeCashFlow >= 0 ? 'stat--positive' : 'stat--negative';
   const cashFlowPrefix = freeCashFlow >= 0 ? '+' : '';
 
+  // Build personalized next-steps section
+  const nextStepsHtml = buildNextStepsHtml(data, tests);
+
   results.innerHTML = `
     <div class="results-inner">
 
@@ -409,6 +671,8 @@ function renderResults(data) {
           <span class="stat__value">${cashFlowPrefix}${formatCurrency(freeCashFlow)}</span>
         </div>
       </div>
+
+      ${nextStepsHtml}
 
     </div>
   `;
