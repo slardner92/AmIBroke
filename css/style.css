@@ -975,12 +975,23 @@ body {
   padding: 44px 34px;
   text-align: left;
   box-shadow: var(--card-shadow);
+  border-top: 5px solid transparent;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
+
+.why-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.11);
+}
+
+/* Per-card accent colours */
+.why-card--housing { border-top-color: var(--blue); }
+.why-card--debt    { border-top-color: #ef4444; }
+.why-card--cash    { border-top-color: #16a34a; }
 
 .why-icon {
   width: 54px;
   height: 54px;
-  background: #f0e8f8;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -988,6 +999,11 @@ body {
   font-size: 24px;
   margin-bottom: 26px;
 }
+
+/* Per-card icon tints */
+.why-card--housing .why-icon { background: #e0e0ff; }
+.why-card--debt    .why-icon { background: #fee2e2; }
+.why-card--cash    .why-icon { background: #dcfce7; }
 
 .why-card h3 {
   color: var(--blue);
