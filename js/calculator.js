@@ -96,9 +96,9 @@ const RESOURCES = {
     url: 'https://www.betterment.com', cta: 'GET STARTED →',
   },
   budget: {
-    icon: '📝', title: 'Try a Budgeting App',
-    desc: 'Track spending and find where your money goes',
-    url: 'https://www.nerdwallet.com/finance/learn/best-budget-apps', cta: 'BROWSE →',
+    icon: '📝', title: 'Try Empower — it\'s free',
+    desc: 'Track spending, budgets, and net worth in one place — no cost',
+    url: 'https://www.empower.com', cta: 'GET STARTED →',
   },
 };
 
