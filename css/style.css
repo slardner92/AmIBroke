@@ -1243,9 +1243,33 @@ body {
 /* ============================================
    SECONDARY PAGES (About, Contact, Privacy)
    ============================================ */
+.page-nav {
+  background: var(--blue);
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+}
+
+.page-nav__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pink);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  text-transform: uppercase;
+  opacity: 0.85;
+  transition: opacity 0.18s ease;
+}
+
+.page-nav__back:hover { opacity: 1; }
+
 .page-hero {
   background: var(--blue);
-  padding: 100px 60px 80px;
+  padding: 60px 60px 80px;
   text-align: center;
 }
 
