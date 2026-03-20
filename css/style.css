@@ -132,7 +132,7 @@ body {
 
 .hero-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(90px, 16vw, 170px);
+  font-size: clamp(52px, 16vw, 170px);
   font-weight: 900;
   color: var(--pink);
   line-height: 0.92;
@@ -376,7 +376,7 @@ body {
 }
 
 .housing-toggle__btn {
-  padding: 8px 24px;
+  padding: 12px 24px;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: 13px;
@@ -424,7 +424,7 @@ body {
 }
 
 .br-btn {
-  padding: 6px 14px;
+  padding: 10px 14px;
   border: 1.5px solid var(--blue);
   border-radius: 20px;
   background: transparent;
@@ -559,7 +559,7 @@ body {
 
 .verdict__title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(60px, 12vw, 110px);
+  font-size: clamp(40px, 12vw, 110px);
   line-height: 0.95;
   margin-bottom: 16px;
 }
@@ -1074,6 +1074,11 @@ body {
   .result-test        { grid-template-columns: auto 1fr auto; gap: 12px; }
   .action-card__resource { flex-direction: column; text-align: center; gap: 8px; }
   .action-card__resource-cta { margin-left: 0; }
+  .hero-badge         { display: none; }
+  .hero-panel--left,
+  .hero-panel--right  { display: none; }
+  .why-section        { padding: 70px 24px; }
+  .why-card           { padding: 28px 22px; }
 }
 
 /* Bar charts: stack label+amount on top, full-width bar below */
