@@ -1076,6 +1076,24 @@ body {
   .action-card__resource-cta { margin-left: 0; }
 }
 
+/* Bar charts: stack label+amount on top, full-width bar below */
+@media (max-width: 500px) {
+  .rent-chart__row,
+  .car-chart__row {
+    grid-template-columns: 1fr auto;
+    gap: 4px 8px;
+  }
+
+  .rent-chart__row-label,
+  .car-chart__row-label  { grid-row: 1; grid-column: 1; }
+
+  .rent-chart__row-amount,
+  .car-chart__row-amount { grid-row: 1; grid-column: 2; font-size: 15px; min-width: unset; }
+
+  .rent-chart__track,
+  .car-chart__track      { grid-row: 2; grid-column: 1 / -1; }
+}
+
 /* ============================================
    WHY IT MATTERS
    ============================================ */
